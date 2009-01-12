@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 <string name="app_name">Bookmarker</string>
-<string name="welcome">Welcome to Bookmarker.\n\nBookmarker is a very simple app which allows you to reorder and delete the bookmarks used in the G1\'s web browser.\nSimple.\n\nSource code at: http://code.google.com/p/androidbookmarker\n\nGeekYouUp 2009</string>
+<string name="welcome">Welcome to Bookmarker.\n\nBookmarker is a very simple app which allows you to reorder and delete the bookmarks used in the G1\'s web browser.\nSimple.\n\nSource code at: http://androidbookmarker.googlecode.com\n\nGeekYouUp 2009</string>
 <string name="nomarks">\n\nYou don\'t have any bookmarks at the moment, Bookmarker will now close.</string>
 </resources>
