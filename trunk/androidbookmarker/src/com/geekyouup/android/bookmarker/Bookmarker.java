@@ -4,12 +4,17 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 
@@ -20,6 +25,7 @@ public class Bookmarker extends Activity implements OnItemClickListener, OnClick
     private ImageButton upButton;
     private ImageButton downButton;
     private ImageButton deleteButton;
+    private Button launchButton;
     private static final int DIALOG_YES_NO_MESSAGE = 1;
     private static final int DIALOG_WELCOME = 2;
     private int currentPos = -1;
@@ -37,20 +43,18 @@ public class Bookmarker extends Activity implements OnItemClickListener, OnClick
        upButton = (ImageButton) findViewById(R.id.upbutton);
        downButton = (ImageButton) findViewById(R.id.downbutton);
        deleteButton = (ImageButton) findViewById(R.id.deletebutton);
+       launchButton = (Button) findViewById(R.id.launchbutton);
        
        upButton.setOnClickListener(this);
        downButton.setOnClickListener(this);
        deleteButton.setOnClickListener(this);
+       launchButton.setOnClickListener(this);
        
        //if we have some bookmarks select the first and start everything
        if(bookmarkAdapter.getCount()>0)
        {
     	   currentPos=0;
     	   bookmarkAdapter.setSelected(currentPos);
-    	   
-	   		upButton.setVisibility(View.VISIBLE);
-			downButton.setVisibility(View.VISIBLE);
-			deleteButton.setVisibility(View.VISIBLE);
        }
        
        showDialog(DIALOG_WELCOME);
@@ -60,15 +64,11 @@ public class Bookmarker extends Activity implements OnItemClickListener, OnClick
    
 	public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
 		currentPos = position;
-		upButton.setVisibility(View.VISIBLE);
-		downButton.setVisibility(View.VISIBLE);
-		deleteButton.setVisibility(View.VISIBLE);
 		bookmarkAdapter.setSelected(position);
 	}
 
 	public void onClick(View v) {
-
-		//Toast.makeText(this, "Click: id="+v.getId() + " parent=" + v.getParent().toString(), Toast.LENGTH_SHORT).show();
+	
 		if(v == upButton && currentPos >=0)
 		{
 			bookmarkAdapter.moveItemUp(currentPos);
@@ -80,6 +80,15 @@ public class Bookmarker extends Activity implements OnItemClickListener, OnClick
 		}else if(v== deleteButton)
 		{
 			showDialog(DIALOG_YES_NO_MESSAGE);
+		}else if(v==launchButton)
+		{
+			String url = bookmarkAdapter.getUrl(currentPos);
+			if(url != null)
+			{
+		        Intent i = new Intent("android.intent.action.VIEW",Uri.parse(url));
+		        startActivity(i);
+		        finish();
+			}
 		}
 		
 	}
@@ -110,7 +119,7 @@ public class Bookmarker extends Activity implements OnItemClickListener, OnClick
             dialog.setMessage(message);
             dialog.setButton("OK", new DialogInterface.OnClickListener() {
 	             public void onClick(DialogInterface dialog, int whichButton) {
-	            	if(bookmarkAdapter.getCount()<1) {Bookmarker.this.finish();}
+	            	if(bookmarkAdapter.getCount()<1) { finish();}
 	             }
 	         });
             

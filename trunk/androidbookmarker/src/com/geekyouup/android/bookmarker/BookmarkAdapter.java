@@ -19,6 +19,7 @@ package com.geekyouup.android.bookmarker;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -458,5 +459,13 @@ class BookmarkAdapter extends BaseAdapter {
 			updateRow(rowOnTop);
 			updateRow(rowUnder);
 		}
+    }
+    
+    public String launchUrlOfItem(int position)
+    {
+    	try
+    	{
+    		return getRow(position).getString(Browser.BookmarkColumns.URL);
+    	}catch(Exception e){ return null;}
     }
 }
