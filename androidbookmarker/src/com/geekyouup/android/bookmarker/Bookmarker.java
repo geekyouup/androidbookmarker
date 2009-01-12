@@ -69,11 +69,11 @@ public class Bookmarker extends Activity implements OnItemClickListener, OnClick
 
 	public void onClick(View v) {
 	
-		if(v == upButton && currentPos >=0)
+		if(v == upButton && currentPos >0)
 		{
 			bookmarkAdapter.moveItemUp(currentPos);
 			currentPos--;
-		}else if(v== downButton && currentPos >=0)
+		}else if(v== downButton && currentPos >=0 && currentPos<bookmarkAdapter.getCount()-1)
 		{
 			bookmarkAdapter.moveItemDown(currentPos);
 			currentPos++;
