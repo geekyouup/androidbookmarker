@@ -19,7 +19,6 @@ package com.geekyouup.android.bookmarker;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -29,7 +28,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Browser;
-import android.provider.Browser.BookmarkColumns;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebIconDatabase;
@@ -37,6 +35,7 @@ import android.webkit.WebIconDatabase.IconListener;
 import android.widget.BaseAdapter;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 
 class BookmarkAdapter extends BaseAdapter {
 
@@ -90,6 +89,40 @@ class BookmarkAdapter extends BaseAdapter {
                 Browser.BookmarkColumns.BOOKMARK + " == 1", mIconReceiver);
     }
     
+    public void initialiseAllRows()
+    {
+    	int processed = 0;
+    	
+    	//ensures each row has a created time
+    	while(processed < mCount)
+    	{
+	    	for(int i=0;i<mCount;i++)
+	    	{
+	    		Bundle thisRow = getRow(i, true);
+	    		Long thisCreateTime = thisRow.getLong(Browser.BookmarkColumns.CREATED);
+	    		if(thisCreateTime==null || thisCreateTime<900)
+	    		{
+	    			//get createTime of row above and subtract 1000;
+	    			long createTime = (mCount-i)*1000;
+	    			if(i>0)
+	    			{
+	    				Bundle prevRow = getRow(i, true);
+	    				Long prevCreateTime = prevRow.getLong(Browser.BookmarkColumns.CREATED);
+	    				if(prevCreateTime!=null && prevCreateTime>1001)
+	    				{
+	    					createTime = prevCreateTime-1000;
+	    				}
+	    			}
+	    			
+	    			thisRow.putLong(Browser.BookmarkColumns.CREATED,createTime);
+	    			updateRow(thisRow, true);
+	    			break;//underlying dataset has updated so quit the loop and start again
+	    		}
+	    		processed=i+1;
+	    	}
+    	}
+    }
+    
     /**
      *  Return a hashmap with one row's Title, Url, and favicon.
      *  @param position  Position in the list.
@@ -97,7 +130,7 @@ class BookmarkAdapter extends BaseAdapter {
      *                   for the url.  Return a blank map if position is out of
      *                   range.
      */
-    public Bundle getRow(int position) {
+    public Bundle getRow(int position, boolean includeCreateTime) {
         Bundle map = new Bundle();
         if (position < 0 || position >= mCount) {
             return map;
@@ -113,7 +146,18 @@ class BookmarkAdapter extends BaseAdapter {
             map.putParcelable(Browser.BookmarkColumns.FAVICON,
                     BitmapFactory.decodeByteArray(data, 0, data.length));
         }
+        
+        if(includeCreateTime && createdColumnIndex != -1)
+        {
+        	Long createTime = mCursor.getLong(createdColumnIndex);
+        	if(createTime != null && createTime != 0)
+        	{
+        		map.putLong(Browser.BookmarkColumns.CREATED,createTime);	
+        	}
+        }
+        
         map.putInt("id", mCursor.getInt(Browser.HISTORY_PROJECTION_ID_INDEX));
+        
         return map;
     }
 
@@ -122,7 +166,7 @@ class BookmarkAdapter extends BaseAdapter {
      *  Requeries the database if the information has changed.
      *  @param map  Bundle storing id, title and url of new information
      */
-    public void updateRow(Bundle map) {
+    public void updateRow(Bundle map, boolean includeCreateTime) {
 
         // Find the record
         int id = map.getInt("id");
@@ -154,6 +198,12 @@ class BookmarkAdapter extends BaseAdapter {
         if(favicon != null)
         {
         	values.put(Browser.BookmarkColumns.FAVICON,favicon);
+        }
+        
+        if(includeCreateTime)
+        {
+	        Long createTime = map.getLong(Browser.BookmarkColumns.CREATED);
+	        if(createTime!= null) values.put(Browser.BookmarkColumns.CREATED,createTime);
         }
         
         if (values.size() > 0
@@ -255,6 +305,7 @@ class BookmarkAdapter extends BaseAdapter {
     /**
      *  Internal function used in search, sort, and refreshList.
      */
+    private int createdColumnIndex = -1;
     private void searchInternal() {
         if (mCursor != null) {
             mCursor.unregisterContentObserver(mChangeObserver);
@@ -262,12 +313,18 @@ class BookmarkAdapter extends BaseAdapter {
             mCursor.deactivate();
         }
 
+    	//need to add the created date column to the query
+    	String[] columns = new String[Browser.HISTORY_PROJECTION.length+1];
+    	System.arraycopy(Browser.HISTORY_PROJECTION, 0, columns, 0,Browser.HISTORY_PROJECTION.length);
+    	createdColumnIndex = columns.length-1;
+    	columns[createdColumnIndex] = Browser.BookmarkColumns.CREATED;
+    	
     	String whereClause = Browser.BookmarkColumns.BOOKMARK + " == 1";
     	String orderBy = Browser.BookmarkColumns.CREATED + " DESC";
     	String[] selectionArgs = null;
         mCursor = mContentResolver.query(
             Browser.BOOKMARKS_URI,
-            Browser.HISTORY_PROJECTION,
+            columns,
             whereClause,
             selectionArgs, 
             orderBy);
@@ -384,7 +441,7 @@ class BookmarkAdapter extends BaseAdapter {
     private void bind(BookmarkItem b, int position) {
         mCursor.moveToPosition(position);
 
-        String title = mCursor.getString(Browser.HISTORY_PROJECTION_TITLE_INDEX);
+        String title = mCursor.getString(Browser.HISTORY_PROJECTION_TITLE_INDEX);            
         b.setName(title);
         String url = mCursor.getString(Browser.HISTORY_PROJECTION_URL_INDEX);
         b.setUrl(url);
@@ -426,12 +483,13 @@ class BookmarkAdapter extends BaseAdapter {
         }
     }
     
-    public void moveItemUp(int position)
+    //returns new position
+    public int moveItemUp(int position)
     {
 		if(position > 0)
 		{
-			Bundle rowOnTop = getRow(position-1);
-			Bundle rowUnder = getRow(position);
+			Bundle rowOnTop = getRow(position-1, false);
+			Bundle rowUnder = getRow(position, false);
 			
 			int upId = rowOnTop.getInt("id");
 			rowOnTop.putInt("id",rowUnder.getInt("id"));
@@ -439,33 +497,76 @@ class BookmarkAdapter extends BaseAdapter {
 		
 			mCurrentSelection--;
 			
-			updateRow(rowOnTop);
-			updateRow(rowUnder);
-		}
+			updateRow(rowOnTop, false);
+			updateRow(rowUnder, false);
+			
+			return mCurrentSelection;
+		}else return position;
     }
     
-    public void moveItemDown(int position)
+    //returns new position
+    public int moveItemDown(int position)
     {
 		if(position < mCount-1)
 		{
-			Bundle rowOnTop = getRow(position);
-			Bundle rowUnder = getRow(position+1);
+			Bundle rowOnTop = getRow(position, false);
+			Bundle rowUnder = getRow(position+1, false);
 			
 			int upId = rowOnTop.getInt("id");
 			rowOnTop.putInt("id",rowUnder.getInt("id"));
 			rowUnder.putInt("id",upId);
 		
 			mCurrentSelection++;
-			updateRow(rowOnTop);
-			updateRow(rowUnder);
+			updateRow(rowOnTop, false);
+			updateRow(rowUnder, false);
+			
+			return mCurrentSelection;
+		}else return position;
+    }
+    
+    //returns new position
+    public int moveToTop(int position)
+    {
+		if(position > 0)
+		{
+			//get the row
+			Bundle rowToMove = getRow(position, false);
+			//set its created time to now
+			rowToMove.putLong(Browser.BookmarkColumns.CREATED, new Date().getTime());
+			//update the row
+			updateRow(rowToMove, true);
+			
+			mCurrentSelection=0;
+			return mCurrentSelection;
+		}else return position;
+    }
+    
+    //returns new post
+    public int moveToBottom(int position)
+    {
+		if(position < mCount-1)
+		{
+			//get the time the last row in the list was created
+			Bundle lastRow = getRow(mCount-1, true);
+			Long createTime = lastRow.getLong(Browser.BookmarkColumns.CREATED);
+
+			long newCreateTime = (createTime==null || createTime ==0)?0:createTime-1;
+			//set the create time of our row to older than the last on the list
+			Bundle rowToMove = getRow(position, false);
+			rowToMove.putLong(Browser.BookmarkColumns.CREATED, newCreateTime);
+			updateRow(rowToMove, true);
+
+			mCurrentSelection=mCount-1;
+			return mCurrentSelection;
 		}
+		else return position;
     }
     
     public String launchUrlOfItem(int position)
     {
     	try
     	{
-    		return getRow(position).getString(Browser.BookmarkColumns.URL);
+    		return getRow(position, false).getString(Browser.BookmarkColumns.URL);
     	}catch(Exception e){ return null;}
     }
 }

@@ -7,45 +7,72 @@
 <ListView android:id="@+id/mylistview"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    />
+/>
+<ImageView
+android:id="@+id/imageview"
+android:layout_width="70px"
+android:layout_height="427px"
+android:layout_x="250px"
+android:layout_y="0px"
+android:background="#66FFFFFF"
+>
+</ImageView>
+<ImageButton
+		android:id="@+id/topbutton"
+		android:layout_width="64px"
+		android:layout_height="60px"
+		android:src="@drawable/top"
+		android:layout_x="252px"
+		android:layout_y="5px"
+		android:scaleType="fitCenter"
+		></ImageButton>
 <ImageButton
 			android:id="@+id/upbutton"
-			android:layout_width="70px"
+			android:layout_width="64px"
 			android:layout_height="60px"
-			android:src="@android:drawable/arrow_up_float"
-			android:layout_x="245px"
-			android:layout_y="5px"
+			android:src="@drawable/up"
+			android:layout_x="252px"
+			android:layout_y="70px"
 			android:scaleType="fitCenter"
 			></ImageButton>
 
 <ImageButton
 			android:id="@+id/downbutton"
-			android:src="@android:drawable/arrow_down_float"
-			android:layout_width="70px"
+			android:src="@drawable/down"
+			android:layout_width="64px"
 			android:layout_height="60px"
-			android:layout_x="245px"
-			android:layout_y="70px"
+			android:layout_x="252px"
+			android:layout_y="135px"
 			android:scaleType="fitCenter"
 			></ImageButton>
-<Button
-android:id="@+id/launchbutton"
-android:layout_width="70px"
-android:layout_height="60px"
-android:text="launch"
-android:textSize="12sp"
-android:layout_x="245px"
-android:layout_y="315px"
->
-</Button>					
+<ImageButton
+			android:id="@+id/bottombutton"
+			android:src="@drawable/bottom"
+			android:layout_width="64px"
+			android:layout_height="60px"
+			android:layout_x="252px"
+			android:layout_y="200px"
+			android:scaleType="fitCenter"
+			></ImageButton>			
+<ImageButton
+			android:id="@+id/launchbutton"
+			android:src="@drawable/launch"
+			android:layout_width="64px"
+			android:layout_height="60px"
+			android:layout_x="252px"
+			android:layout_y="305px"
+			android:scaleType="fitCenter"
+			></ImageButton>		
+				
 			
 <ImageButton
 android:id="@+id/deletebutton"
-android:layout_width="70px"
+android:layout_width="64px"
 android:layout_height="60px"
-android:src="@android:drawable/ic_delete"
+android:src="@drawable/trash"
 android:textSize="12sp"
-android:layout_x="245px"
-android:layout_y="380px"
+android:layout_x="252px"
+android:layout_y="370px"
 >
 </ImageButton>			
 </AbsoluteLayout>
