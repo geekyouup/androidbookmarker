@@ -1,0 +1,6 @@
+v1.0.2 - Improved UI with new images and transparency
+		 Added Move to Top and Move to Bottom functionality
+		 Welcome Message only shows on first launch
+		 Added a context menu with 'Add New' and About
+v1.0.1 - Bug Fix to stop Force Close when user moves past top or bottom of list then Launches
+v1.0.0 - Initial release
