@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<ListView android:id="@+id/mylistview"
+    android:layout_width="fill_parent" 
+    android:layout_height="210px" 
+/>
+<ImageView
+android:id="@+id/imageview"
+android:layout_width="480px"
+android:layout_height="70px"
+android:layout_x="0px"
+android:layout_y="210px"
+android:background="#66FFFFFF"
+>
+</ImageView>
+<ImageButton
+		android:id="@+id/topbutton"
+		android:layout_width="64px"
+		android:layout_height="60px"
+		android:src="@drawable/top"
+		android:layout_x="2px"
+		android:layout_y="212px"
+		android:scaleType="fitCenter"
+		></ImageButton>
+<ImageButton
+			android:id="@+id/upbutton"
+			android:layout_width="64px"
+			android:layout_height="60px"
+			android:src="@drawable/up"
+			android:layout_x="68px"
+			android:layout_y="212px"
+			android:scaleType="fitCenter"
+			></ImageButton>
+
+<ImageButton
+			android:id="@+id/downbutton"
+			android:src="@drawable/down"
+			android:layout_width="64px"
+			android:layout_height="60px"
+			android:layout_x="134px"
+			android:layout_y="212px"
+			android:scaleType="fitCenter"
+			></ImageButton>
+<ImageButton
+			android:id="@+id/bottombutton"
+			android:src="@drawable/bottom"
+			android:layout_width="64px"
+			android:layout_height="60px"
+			android:layout_x="200px"
+			android:layout_y="212px"
+			android:scaleType="fitCenter"
+			></ImageButton>	
+
+<ImageButton
+android:id="@+id/launchbutton"
+android:src="@drawable/launch"
+android:layout_width="64px"
+android:layout_height="60px"
+android:layout_x="348px"
+android:layout_y="212px"
+android:scaleType="fitCenter"
+></ImageButton>				
+<ImageButton
+android:id="@+id/deletebutton"
+android:layout_width="64px"
+android:layout_height="60px"
+android:src="@drawable/trash"
+android:textSize="12sp"
+android:layout_x="414px"
+android:layout_y="212px"
+>
+</ImageButton>			
+</AbsoluteLayout>
