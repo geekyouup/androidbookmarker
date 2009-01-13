@@ -170,7 +170,7 @@ public class Bookmarker extends Activity implements OnItemClickListener, OnClick
 	             }})
 	         	.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 		             public void onClick(DialogInterface dialog, int whichButton) {
-		            	 bookmarkAdapter.deleteRow(currentPos);
+		            	//do nothing
 	             }})
 	         .create();
 		}else if(id == DIALOG_WELCOME)
